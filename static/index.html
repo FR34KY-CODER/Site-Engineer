@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Engineer</title>
+
+    <!-- CodeMirror Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #1a1a2e;
+            --bg-med: #16213e;
+            --bg-light: #0f3460;
+            --border-color: #1f4068;
+            --text-color: #e94560;
+            --text-secondary: #c9d1d9;
+            --accent-color: #e94560;
+            --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+            --header-gradient: linear-gradient(90deg, #16213e, #0f3460);
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-family);
+            color: var(--text-color);
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--bg-dark);
+        }
+
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            transition: opacity 0.5s ease;
+            opacity: 0; /* Hidden by default */
+        }
+        #particle-canvas.active {
+            opacity: 1;
+        }
+
+        .app-window {
+            width: 95vw;
+            height: 90vh;
+            background: rgba(22, 33, 62, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        .controls-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1rem 1.5rem;
+            background: var(--header-gradient);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            flex-shrink: 0;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        #promptInput {
+            flex-grow: 1;
+            background-color: var(--bg-dark);
+            color: var(--text-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+        #promptInput:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(233, 69, 96, 0.5);
+        }
+
+        #generateBtn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(233, 69, 96, 0.3);
+        }
+        #generateBtn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(233, 69, 96, 0.5);
+        }
+        #generateBtn:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+        }
+
+        .main-container {
+            display: flex;
+            flex-grow: 1;
+            height: 100%;
+        }
+
+        .panel {
+            width: 50%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .panel-header {
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background-color: var(--bg-med);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .CodeMirror {
+            height: 100%;
+            font-family: "Fira Code", "SF Mono", "Consolas", monospace;
+            font-size: 0.95rem;
+            background: transparent;
+        }
+        .CodeMirror-gutters {
+            background: var(--bg-med) !important;
+        }
+
+        #preview-container {
+            flex-grow: 1;
+            position: relative;
+            background-color: white;
+            border-left: 1px solid var(--border-color);
+        }
+        
+        .loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--accent-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        #preview-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .toast {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--accent-color);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            font-weight: 600;
+            transition: top 0.5s ease-in-out;
+        }
+        .toast.show {
+            top: 20px;
+        }
+
+        /* --- NEW: Animation Toggle Switch --- */
+        .animation-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto; /* Pushes it to the right */
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-light);
+            transition: .4s;
+            border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--accent-color);
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+    </style>
+</head>
+<body>
+    
+    <canvas id="particle-canvas"></canvas>
+
+    <div class="app-window">
+        <header class="controls-header">
+            <h1>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
+                Site Engineer
+            </h1>
+            <input type="text" id="promptInput" placeholder="Describe the website you want to build...">
+            <button id="generateBtn">Generate</button>
+            <!-- NEW: Animation Toggle Switch -->
+            <div class="animation-toggle">
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">Animate BG</span>
+                <label class="switch">
+                    <input type="checkbox" id="animationToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </header>
+
+        <main class="main-container">
+            <div class="panel" id="editor-panel">
+                <div class="panel-header">HTML Code</div>
+                <textarea id="html-editor"></textarea>
+            </div>
+            <div class="panel" id="preview-panel">
+                <div class="panel-header">Live Preview</div>
+                <div id="preview-container">
+                    <div class="loader" id="loader"></div>
+                    <iframe id="preview-frame" title="Live Preview"></iframe>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const promptInput = document.getElementById('promptInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const previewFrame = document.getElementById('preview-frame');
+        const loader = document.getElementById('loader');
+        const toast = document.getElementById('toast');
+        const animationToggle = document.getElementById('animationToggle');
+        const particleCanvas = document.getElementById('particle-canvas');
+
+        const editor = CodeMirror.fromTextArea(document.getElementById('html-editor'), {
+            mode: 'htmlmixed',
+            theme: 'dracula',
+            lineNumbers: true,
+            lineWrapping: true,
+            autoCloseTags: true,
+        });
+
+        editor.on('change', () => updatePreview());
+        generateBtn.addEventListener('click', handleGenerate);
+        promptInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                handleGenerate();
+            }
+        });
+
+        async function handleGenerate() {
+            const prompt = promptInput.value.trim();
+            if (!prompt) {
+                showToast("Please enter a description for the website.");
+                return;
+            }
+
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Initializing...';
+            editor.setValue('');
+            updatePreview();
+            loader.style.display = 'block';
+            previewFrame.style.opacity = '0.5';
+
+            try {
+                const response = await fetch('http://127.0.0.1:11434/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt }),
+                });
+
+                if (!response.ok || !response.body) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    
+                    const lines = buffer.split('\n\n');
+                    buffer = lines.pop();
+
+                    for (const line of lines) {
+                        if (!line.startsWith('data: ')) continue;
+
+                        const message = line.substring(6);
+                        
+                        if (message.startsWith('[DATA]')) {
+                            const data = message.substring(7);
+                            editor.setValue(editor.getValue() + data + '\n');
+                            editor.setCursor(editor.lineCount(), 0);
+                        } else if (message.startsWith('[STATUS]')) {
+                            const status = message.substring(9);
+                            if(status.includes('load model')) generateBtn.textContent = 'Loading...';
+                            if(status.includes('processing')) generateBtn.textContent = 'Processing...';
+                            if(status.includes('sampling')) generateBtn.textContent = 'Generating...';
+                        } else if (message.trim() === '[DONE]') {
+                            finalizeGeneration();
+                            return;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error during generation:', error);
+                editor.setValue(`<!-- An error occurred: ${error.message} -->`);
+                showToast("Failed to connect to the backend.", "error");
+            } finally {
+                finalizeGeneration();
+            }
+        }
+
+        function finalizeGeneration() {
+            generateBtn.disabled = false;
+            generateBtn.textContent = 'Generate';
+            loader.style.display = 'none';
+            previewFrame.style.opacity = '1';
+            updatePreview();
+        }
+
+        function updatePreview() {
+            previewFrame.srcdoc = editor.getValue();
+        }
+
+        function showToast(message, type = "info") {
+            toast.textContent = message;
+            toast.style.backgroundColor = type === "error" ? "#e74c3c" : "var(--accent-color)";
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        editor.setValue(`<!-- 
+  Welcome to Site Engineer!
+  1. Describe the website you want to build in the bar above.
+  2. Click "Generate".
+  3. The generated code will appear here with syntax highlighting.
+  4. The rendered website will appear on the right.
+-->`);
+        updatePreview();
+
+        // --- Particle Network Animation Logic (Now Controllable) ---
+        const ctx = particleCanvas.getContext('2d');
+        let particles = [];
+        let animationFrameId;
+
+        animationToggle.addEventListener('change', () => {
+            if (animationToggle.checked) {
+                particleCanvas.classList.add('active');
+                startAnimation();
+            } else {
+                particleCanvas.classList.remove('active');
+                stopAnimation();
+            }
+        });
+
+        function resizeCanvas() {
+            particleCanvas.width = window.innerWidth;
+            particleCanvas.height = window.innerHeight;
+        }
+        
+        class Particle {
+            constructor() {
+                this.x = Math.random() * particleCanvas.width;
+                this.y = Math.random() * particleCanvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+            }
+            update() {
+                if (this.x > particleCanvas.width || this.x < 0) this.speedX *= -1;
+                if (this.y > particleCanvas.height || this.y < 0) this.speedY *= -1;
+                this.x += this.speedX;
+                this.y += this.speedY;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(233, 69, 96, 0.5)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            let numberOfParticles = (particleCanvas.width * particleCanvas.height) / 12000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function connectParticles() {
+            for (let a = 0; a < particles.length; a++) {
+                for (let b = a; b < particles.length; b++) {
+                    let distance = Math.sqrt(Math.pow(particles[a].x - particles[b].x, 2) + Math.pow(particles[a].y - particles[b].y, 2));
+                    if (distance < 120) {
+                        const opacity = 1 - (distance / 120);
+                        ctx.strokeStyle = `rgba(233, 69, 96, ${opacity})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[a].x, particles[a].y);
+                        ctx.lineTo(particles[b].x, particles[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+            for (let p of particles) {
+                p.update();
+                p.draw();
+            }
+            connectParticles();
+            animationFrameId = requestAnimationFrame(animate);
+        }
+        
+        function startAnimation() {
+            if (!animationFrameId) {
+                resizeCanvas();
+                initParticles();
+                animate();
+            }
+        }
+
+        function stopAnimation() {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+                ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            if (animationToggle.checked) {
+                stopAnimation();
+                startAnimation();
+            }
+        });
+
+    </script>
+</body>
+</html>
