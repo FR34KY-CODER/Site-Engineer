@@ -27,14 +27,6 @@ Site Engineer is a **fully local full-stack web application** that transforms a 
 
 ---
 
-## 🖥️ Demo Preview
-
-<p align="center">
-  <img src="https://github.com/FR34KY-CODER/WebSite-Generator/blob/main/Site%20Engineer%20Screenshot.png?raw=true" alt="Site Engineer UI" width="85%">
-</p>
-
----
-
 ## 📦 Setup and Installation
 
 ### 🔧 Requirements
