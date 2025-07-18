@@ -2,8 +2,7 @@
 
 This project is a full-stack, locally-run web application that uses a large language model (LLM) to generate complete, self-contained websites from a single text prompt. The entire system runs on local hardware, leveraging `llama.cpp` for efficient model inference on a consumer GPU.
 
-![Project Screenshot](https://placehold.co/800x400/0d1117/c9d1d9?text=Your+App+Screenshot+Here)
-*(Replace the URL above with a screenshot of your application)*
+![Project Screenshot](https://github.com/FR34KY-CODER/WebSite-Generator/blob/main/Site%20Engineer%20Screenshot.png?raw=true)
 
 ## Features
 
