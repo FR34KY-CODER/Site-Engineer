@@ -1,60 +1,152 @@
-# Site Engineer
+# 🚧 Site Engineer: AI-Powered Local Website Generator
 
-This project is a full-stack, locally-run web application that uses a large language model (LLM) to generate complete, self-contained websites from a single text prompt. The entire system runs on local hardware, leveraging `llama.cpp` for efficient model inference on a consumer GPU.
+Site Engineer is a **fully local full-stack web application** that transforms a simple prompt into a complete, responsive website — all with the help of a large language model running on your **own GPU**. No cloud. No API keys. No limits.
 
-![Project Screenshot](https://github.com/FR34KY-CODER/WebSite-Generator/blob/main/Site%20Engineer%20Screenshot.png?raw=true)
+> 🧠 Powered by **DeepSeek Coder 6.7B**, streamed in real-time via `llama.cpp`.
 
-## Features
+![Site Engineer Screenshot](https://github.com/FR34KY-CODER/WebSite-Generator/blob/main/Site%20Engineer%20Screenshot.png?raw=true)
 
--   **Full-Stack Application:** A complete end-to-end system with a Python FastAPI backend and a vanilla JavaScript frontend.
--   **Local LLM Inference:** Runs the DeepSeek Coder 6.7B model locally using `llama-cli.exe`, ensuring privacy and zero API costs.
--   **Real-time Streaming:** Streams the generated HTML code token-by-token, providing a live-updating editor and preview.
--   **GPU Accelerated:** Optimized to use GPU offloading (`--n-gpu-layers`) for significantly faster performance on consumer hardware.
--   **Advanced Prompt Engineering:** Utilizes a highly-structured prompt to guide the LLM into generating clean, responsive, and high-quality HTML, CSS, and JavaScript code.
+---
 
-## Setup and Installation
+## ✨ Key Features
 
-Follow these steps to get the project running on your local machine (Windows).
+* ⚙️ **Full-Stack Application**
+  Combines a **FastAPI backend** with a **vanilla JavaScript frontend** for seamless interaction.
 
-### 1. Clone the Repository
+* 💻 **Runs Fully Local**
+  Uses [llama.cpp](https://github.com/ggerganov/llama.cpp)'s `llama-cli.exe` to infer LLM outputs directly on your GPU — no internet, no cost.
+
+* ⚡ **Real-Time Streaming Output**
+  Experience website generation token-by-token as code is streamed into a live editor and preview.
+
+* 🧠 **Deep Prompt Engineering**
+  Utilizes a custom-tuned system prompt that guides the LLM to produce high-quality, clean, and fully responsive HTML, CSS, and JS code.
+
+* 🚀 **GPU Accelerated Inference**
+  Support for `--n-gpu-layers` ensures you get maximum performance out of your hardware.
+
+---
+
+## 🖥️ Demo Preview
+
+<p align="center">
+  <img src="https://github.com/FR34KY-CODER/WebSite-Generator/blob/main/Site%20Engineer%20Screenshot.png?raw=true" alt="Site Engineer UI" width="85%">
+</p>
+
+---
+
+## 📦 Setup and Installation
+
+### 🔧 Requirements
+
+* **Windows OS** (currently tested only on Windows)
+* **Python 3.7+**
+* **Consumer GPU with enough VRAM (6GB+)**
+* Internet access (only for initial model download)
+
+---
+
+### 🧪 Step-by-Step Installation
+
+#### 1. 📁 Clone the Repository
 
 ```bash
-git clone [https://github.com/YOUR_USERNAME/YOUR_REPOSITORY_NAME.git](https://github.com/YOUR_USERNAME/YOUR_REPOSITORY_NAME.git)
-cd YOUR_REPOSITORY_NAME
+git clone https://github.com/YOUR_USERNAME/WebSite-Generator.git
+cd WebSite-Generator
 ```
 
-### 2. Install Dependencies
-
-Ensure you have Python 3.7+ installed. Then, install the required libraries using pip:
+#### 2. 📦 Install Python Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Download the Model
+#### 3. 📥 Download the Model
 
-This project requires the **DeepSeek Coder 6.7B Instruct (Q4_K_M)** model. Due to its large size, the model is not included in this repository.
+* Create a folder named `models`:
 
--   **Create the `models` directory:**
-    ```bash
-    mkdir models
-    ```
--   **Download the model file here:**
-    [**deepseek-coder-6.7b-instruct.Q4_K_M.gguf**](https://huggingface.co/TheBloke/deepseek-coder-6.7b-instruct-GGUF/resolve/main/deepseek-coder-6.7b-instruct.Q4_K_M.gguf?download=true)
--   **Place the downloaded `.gguf` file** inside the `models` directory you just created.
+```bash
+mkdir models
+```
 
-### 4. Get `llama-cli.exe`
+* Download the model file:
+  [`deepseek-coder-6.7b-instruct.Q4_K_M.gguf`](https://huggingface.co/TheBloke/deepseek-coder-6.7b-instruct-GGUF/resolve/main/deepseek-coder-6.7b-instruct.Q4_K_M.gguf?download=true)
 
-You need a compiled version of `llama-cli.exe` from the [llama.cpp](https://github.com/ggerganov/llama.cpp) project.
--   Download or compile `llama-cli.exe`.
--   Place the executable file in the root directory of this project.
+* Move it into the `models` folder.
 
-### 5. Run the Application
+#### 4. ⚙️ Get `llama-cli.exe`
 
-Once the model and executable are in place, you can start the server:
+Download or build [`llama-cli.exe`](https://github.com/ggerganov/llama.cpp) and place it in the root directory.
+
+> 🛠️ Tip: You can compile it using `cmake` and `make` or download precompiled binaries from the community.
+
+---
+
+### ▶️ Run the Application
 
 ```bash
 python main.py
 ```
 
-Your web browser should automatically open to `http://127.0.0.1:11434`, and you can start generating websites!
+Your default browser will open automatically to:
+
+```
+http://127.0.0.1:11434
+```
+
+You’re now ready to generate fully functional websites using a single text prompt!
+
+---
+
+## 🧠 How It Works
+
+1. **You enter a text prompt**, like "Portfolio site for a game developer with a dark theme."
+2. The prompt is sent to the **DeepSeek Coder 6.7B** model running locally via `llama-cli`.
+3. The model **streams code token-by-token** through FastAPI to the browser.
+4. A **live editor** updates HTML/CSS/JS in real-time — with an instant preview!
+
+---
+
+## 🛡️ Privacy & Cost
+
+* ✅ No internet connection required after setup.
+* ✅ No OpenAI, no HuggingFace API keys.
+* ✅ 100% local. 100% free.
+
+---
+
+## 📚 Tech Stack
+
+| Layer       | Tech                        |
+| ----------- | --------------------------- |
+| LLM Backend | DeepSeek Coder 6.7B (GGUF)  |
+| Inference   | llama.cpp (`llama-cli.exe`) |
+| Server      | FastAPI                     |
+| Frontend    | HTML, CSS, Vanilla JS       |
+| Streaming   | Server-Sent Events (SSE)    |
+
+---
+
+## 📸 Demo and ScreenShots
+
+> *Coming Soon....
+<p><img src="https://camo.githubusercontent.com/8adbeb4e0a139c2d1e39e9d0e54ac0ecc63390d095d15aa07ce25b51eaee408e/68747470733a2f2f6d656469612e67697068792e636f6d2f6d656469612f31313165626f6e4d733930594c752f67697068792e676966"></p>
+
+---
+
+## 📄 License
+
+MIT License — see [`LICENSE`](LICENSE) for details.
+
+---
+
+## 💬 Contribute / Feedback
+
+Got a feature idea or bug report?
+Feel free to open an [Issue](https://github.com/YOUR_USERNAME/WebSite-Generator/issues) or drop a [Pull Request](https://github.com/YOUR_USERNAME/WebSite-Generator/pulls)!
+
+---
+
+## 🚀 Credits
+
+Created by [FR34K](https://github.com/FR34KY-CODER) — powered by passion, code, and caffeine.
