@@ -126,12 +126,6 @@ You’re now ready to generate fully functional websites using a single text pro
 
 ---
 
-## 📄 License
-
-MIT License — see [`LICENSE`](LICENSE) for details.
-
----
-
 ## 💬 Contribute / Feedback
 
 Got a feature idea or bug report?
